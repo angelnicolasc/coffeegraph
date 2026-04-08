@@ -11,8 +11,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"os"
 	"time"
+
+	"github.com/coffeegraph/coffeegraph/internal/fsutil"
 )
 
 // Sentinel errors for the graph package.
@@ -163,5 +164,5 @@ func WriteFile(path string, g Graph) error {
 	if err != nil {
 		return fmt.Errorf("marshal graph: %w", err)
 	}
-	return os.WriteFile(path, append(b, '\n'), 0644)
+	return fsutil.AtomicWriteFile(path, append(b, '\n'), 0644)
 }

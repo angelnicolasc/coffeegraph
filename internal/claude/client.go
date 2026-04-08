@@ -38,6 +38,7 @@ type APIError struct {
 	StatusCode int
 	Status     string
 	Body       string
+	RetryAfter time.Duration // parsed from Retry-After header, zero if absent
 }
 
 func (e *APIError) Error() string {
@@ -134,7 +135,16 @@ func (c *Client) Complete(ctx context.Context, systemPrompt, userPrompt string) 
 	var lastErr error
 	for attempt := 0; attempt < maxRetries; attempt++ {
 		if attempt > 0 {
-			backoff := time.Duration(math.Pow(2, float64(attempt))) * time.Second
+			base := time.Duration(math.Pow(2, float64(attempt))) * time.Second
+
+			// Use Retry-After from the previous error when it exceeds
+			// the exponential backoff (common with Anthropic rate limits).
+			var apiErr *APIError
+			if errors.As(lastErr, &apiErr) && apiErr.RetryAfter > 0 && apiErr.RetryAfter > base {
+				base = apiErr.RetryAfter
+			}
+
+			backoff := jitteredBackoff(base)
 			select {
 			case <-ctx.Done():
 				return Result{}, ctx.Err()
@@ -185,12 +195,11 @@ func (c *Client) doRequest(ctx context.Context, client *http.Client, body []byte
 			Status:     resp.Status,
 			Body:       string(b),
 		}
-		// Respect Retry-After for rate limits.
-		if apiErr.IsRateLimited() {
-			if ra := resp.Header.Get("Retry-After"); ra != "" {
-				if secs, err := strconv.Atoi(ra); err == nil {
-					time.Sleep(time.Duration(secs) * time.Second)
-				}
+		// Parse Retry-After into the error so the retry loop can use it
+		// with context-aware sleep instead of blocking here.
+		if ra := resp.Header.Get("Retry-After"); ra != "" {
+			if secs, parseErr := strconv.Atoi(ra); parseErr == nil && secs > 0 {
+				apiErr.RetryAfter = time.Duration(secs) * time.Second
 			}
 		}
 		return Result{}, apiErr

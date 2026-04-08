@@ -100,6 +100,12 @@ func (e *Engine) ExecuteTask(ctx context.Context, it queue.Item) (TaskResult, er
 	}
 	start := time.Now().UTC()
 	skillPath := filepath.Join(e.Root, "skills", it.Skill, "SKILL.md")
+
+	// Validate SKILL.md structure before executing.
+	if err := graph.ValidateSkillFile(skillPath); err != nil {
+		return TaskResult{}, err
+	}
+
 	skillBody, err := os.ReadFile(skillPath)
 	if err != nil {
 		return TaskResult{}, fmt.Errorf("read skill: %w", err)

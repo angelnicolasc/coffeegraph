@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -70,6 +71,11 @@ func Generate(projectRoot string, cfg *config.Config, tasksPending map[string]in
 		skillPath := filepath.Join(skillsDir, name, "SKILL.md")
 		if st, serr := os.Stat(skillPath); serr != nil || st.IsDir() {
 			continue
+		}
+
+		// Warn on invalid SKILL.md but still include in graph.
+		if verr := ValidateSkillFile(skillPath); verr != nil {
+			fmt.Fprintf(os.Stderr, "warning: %s: %v\n", name, verr)
 		}
 
 		cat := skillCategories[name]

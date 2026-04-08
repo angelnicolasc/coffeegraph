@@ -18,7 +18,7 @@ func main() {
 		Version: version,
 	}
 
-	root.AddCommand(newInitCmd(), newAddCmd(), newDashboardCmd(), newVisualizeCmd(), newCoffeeCmd(), newQueueCmd(),
+	root.AddCommand(newInitCmd(), newAddCmd(), newDashboardCmd(), newVisualizeCmd(), newCoffeeCmd(), newRunCmd(), newQueueCmd(),
 		newDeployCmd(), newSuggestCmd(), newBotCmd(), newShareCmd(), newLogCmd(), newDoctorCmd(),
 		newEvolveCmd(), newMCPCmd(), newSkillCmd(), newRoastCmd(), newPartyCmd(), newNapCmd())
 
@@ -88,6 +88,18 @@ func newCoffeeCmd() *cobra.Command {
 	cmd.Flags().BoolVar(&urgent, "urgent", false, "run in meme high-pressure visual mode")
 	cmd.Flags().BoolVar(&chill, "chill", false, "run in calm visual mode")
 	return cmd
+}
+
+func newRunCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:     "run <skill> <task>",
+		Short:   "Run a single task against a skill",
+		Example: `coffeegraph run sales-closer "Follow up this week's leads"`,
+		Args:    cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return cli.RunRun(args[0], args[1])
+		},
+	}
 }
 
 func newQueueCmd() *cobra.Command {

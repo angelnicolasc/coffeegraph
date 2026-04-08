@@ -39,14 +39,32 @@ func WatchSkills(
 
 	ctx, stopFunc := context.WithCancel(ctx)
 
-	var debounceOnce sync.Once
+	// Mutex-guarded debounce timer replaces the sync.Once hack
+	// which had a data race when resetting.
+	var mu sync.Mutex
 	var debounceTimer *time.Timer
+
+	resetDebounce := func() {
+		mu.Lock()
+		defer mu.Unlock()
+		if debounceTimer != nil {
+			debounceTimer.Stop()
+		}
+		debounceTimer = time.AfterFunc(200*time.Millisecond, func() {
+			regenerate(projectRoot, loadConfig, countTasks, onRegenerate)
+		})
+	}
 
 	go func() {
 		defer watcher.Close()
 		for {
 			select {
 			case <-ctx.Done():
+				mu.Lock()
+				if debounceTimer != nil {
+					debounceTimer.Stop()
+				}
+				mu.Unlock()
 				return
 			case ev, ok := <-watcher.Events:
 				if !ok {
@@ -61,16 +79,7 @@ func WatchSkills(
 						_ = addRecursive(watcher, ev.Name)
 					}
 				}
-				// Debounce: reset the timer on every event.
-				debounceOnce.Do(func() {
-					debounceTimer = time.AfterFunc(200*time.Millisecond, func() {
-						regenerate(projectRoot, loadConfig, countTasks, onRegenerate)
-						debounceOnce = sync.Once{} // allow next batch
-					})
-				})
-				if debounceTimer != nil {
-					debounceTimer.Reset(200 * time.Millisecond)
-				}
+				resetDebounce()
 			case err, ok := <-watcher.Errors:
 				if !ok {
 					return
