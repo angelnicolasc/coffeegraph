@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-REPO="coffeegraph/coffeegraph"
+REPO="angelnicolasc/coffeegraph"
 VERSION="${COFFEEGRAPH_VERSION:-latest}"
 INSTALL_DIR="${COFFEEGRAPH_INSTALL_DIR:-/usr/local/bin}"
 

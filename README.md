@@ -31,7 +31,7 @@
 </p>
 
 ```bash
-curl -fsSL https://coffeegraph.dev/install | bash
+curl -fsSL https://raw.githubusercontent.com/angelnicolasc/coffeegraph/main/scripts/install.sh | bash
 coffeegraph init my-agency
 cd my-agency && coffeegraph add sales-closer
 coffeegraph coffee
@@ -272,7 +272,7 @@ Reads your `index.md` business context and returns 3 skill ideas ranked by impac
 
 **One-liner (macOS / Linux / WSL)**
 ```bash
-curl -fsSL https://coffeegraph.dev/install | bash
+curl -fsSL https://raw.githubusercontent.com/angelnicolasc/coffeegraph/main/scripts/install.sh | bash
 ```
 
 **Homebrew** *(coming soon)*
