@@ -48,7 +48,7 @@ changelog:
 
 release:
   github:
-    owner: coffeegraph
+    owner: angelnicolasc
     name: coffeegraph
   draft: false
   prerelease: auto

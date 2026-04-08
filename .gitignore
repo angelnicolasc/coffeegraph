@@ -45,3 +45,9 @@ desktop.ini
 
 # Internal playbook (not for public consumption)
 COFFEEGRAPH_PLAYBOOK.md
+coffeegraph-claudecode-prompt.md
+criticas*.md
+crecer-coffeegraph*.txt
+
+# Coverage reports
+.coverage/
