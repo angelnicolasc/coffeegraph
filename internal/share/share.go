@@ -132,7 +132,7 @@ h1{margin:0 0 6px;font-size:32px;color:#6b4e2f}.meta{color:#6f6556;margin-bottom
 pre{white-space:pre-wrap;background:#f9f7f2;border:1px solid #ece4d8;border-radius:12px;padding:16px}
 </style></head><body><div class="card"><h1>%s</h1><div class="meta">%s</div><pre>%s</pre><div class="meta">%s</div></div></body></html>`,
 		htmlEsc(e.Skill), htmlEsc(e.Task), htmlEsc(Sanitize(e.Result)), htmlEsc(e.FinishedAt.Local().Format(time.RFC1123)))
-	if err := fsutil.AtomicWriteFile(p, []byte(card), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(p, []byte(card), 0o644); err != nil {
 		return "", err
 	}
 	return p, nil

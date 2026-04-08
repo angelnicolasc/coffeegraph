@@ -164,5 +164,5 @@ func WriteFile(path string, g Graph) error {
 	if err != nil {
 		return fmt.Errorf("marshal graph: %w", err)
 	}
-	return fsutil.AtomicWriteFile(path, append(b, '\n'), 0644)
+	return fsutil.AtomicWriteFile(path, append(b, '\n'), 0o644)
 }

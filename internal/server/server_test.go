@@ -13,7 +13,7 @@ func setupGraphFile(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
 	graph := `{"generated_at":"2024-01-01T00:00:00Z","agency":"test","nodes":[{"id":"index","label":"Brain","type":"hub","status":"active"}],"edges":[]}`
-	if err := os.WriteFile(filepath.Join(root, "graph.json"), []byte(graph), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "graph.json"), []byte(graph), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	return root

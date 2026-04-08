@@ -69,7 +69,7 @@ func Write(path string, c *Config) error {
 	if err != nil {
 		return fmt.Errorf("marshal config: %w", err)
 	}
-	return fsutil.AtomicWriteFile(path, b, 0644)
+	return fsutil.AtomicWriteFile(path, b, 0o644)
 }
 
 // LoadRaw reads config.yaml without applying environment variable

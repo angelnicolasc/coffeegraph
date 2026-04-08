@@ -8,12 +8,12 @@ import (
 
 func TestFindRootFound(t *testing.T) {
 	root := t.TempDir()
-	if err := os.WriteFile(filepath.Join(root, "config.yaml"), []byte("agency_name: test\n"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "config.yaml"), []byte("agency_name: test\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// Create a nested directory to search from.
 	nested := filepath.Join(root, "a", "b", "c")
-	if err := os.MkdirAll(nested, 0755); err != nil {
+	if err := os.MkdirAll(nested, 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -36,7 +36,7 @@ func TestFindRootNotFound(t *testing.T) {
 
 func TestFindRootExactDir(t *testing.T) {
 	root := t.TempDir()
-	if err := os.WriteFile(filepath.Join(root, "config.yaml"), []byte("agency_name: x\n"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "config.yaml"), []byte("agency_name: x\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	got, err := FindRoot(root)

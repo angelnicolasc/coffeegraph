@@ -22,14 +22,14 @@ func CopyFSToDir(fsys fs.FS, root, dst string) error {
 		}
 		out := filepath.Join(dst, rel)
 		if d.IsDir() {
-			return os.MkdirAll(out, 0755)
+			return os.MkdirAll(out, 0o755)
 		}
 		rc, err := fsys.Open(path)
 		if err != nil {
 			return err
 		}
 		defer rc.Close()
-		if err := os.MkdirAll(filepath.Dir(out), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(out), 0o755); err != nil {
 			return err
 		}
 		w, err := os.Create(out)

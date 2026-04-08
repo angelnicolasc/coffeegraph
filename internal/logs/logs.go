@@ -63,7 +63,7 @@ duration_ms: %d
 ---
 %s
 `, esc(e.ID), esc(e.Skill), esc(e.Task), esc(e.Status), e.StartedAt.UTC().Format(time.RFC3339), e.FinishedAt.UTC().Format(time.RFC3339), e.DurationMs, strings.TrimSpace(e.Result))
-	if err := fsutil.AtomicWriteFile(path, []byte(body), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(path, []byte(body), 0o644); err != nil {
 		return "", fmt.Errorf("write log: %w", err)
 	}
 	return path, nil

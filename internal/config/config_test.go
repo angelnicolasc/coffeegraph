@@ -111,7 +111,7 @@ api_keys:
 	// Write to temp file.
 	dir := t.TempDir()
 	path := dir + "/config.yaml"
-	if err := os.WriteFile(path, []byte(yaml), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(yaml), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	cfg, err := Load(path)

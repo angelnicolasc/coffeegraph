@@ -48,7 +48,7 @@ func Install(root, name string) (string, error) {
 		return "", err
 	}
 	dst := filepath.Join(root, "skills", name, "SKILL.md")
-	if err := fsutil.AtomicWriteFile(dst, b, 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(dst, b, 0o644); err != nil {
 		return "", err
 	}
 	return dst, nil

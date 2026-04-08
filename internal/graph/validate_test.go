@@ -11,7 +11,7 @@ func TestValidateSkillFileOK(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "SKILL.md")
 	content := "# Skill: test-skill\n\n## Identity\nYou are a test.\n\n## Workflow\n1. Step\n\n## Output Format\nText\n"
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if err := ValidateSkillFile(path); err != nil {
@@ -32,7 +32,7 @@ func TestValidateSkillFileNotFound(t *testing.T) {
 func TestValidateSkillFileEmpty(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "SKILL.md")
-	if err := os.WriteFile(path, []byte(""), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(""), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	err := ValidateSkillFile(path)
@@ -48,7 +48,7 @@ func TestValidateSkillFileMissingIdentity(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "SKILL.md")
 	content := "Some random content without any headers or sections."
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	err := ValidateSkillFile(path)
@@ -64,7 +64,7 @@ func TestValidateSkillFileMissingWorkflow(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "SKILL.md")
 	content := "# Skill: test\n\n## Identity\nYou are a test.\n"
-	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	err := ValidateSkillFile(path)
@@ -89,7 +89,7 @@ func TestValidateSkillFileCaseInsensitive(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			dir := t.TempDir()
 			path := filepath.Join(dir, "SKILL.md")
-			if err := os.WriteFile(path, []byte(tt.content), 0644); err != nil {
+			if err := os.WriteFile(path, []byte(tt.content), 0o644); err != nil {
 				t.Fatal(err)
 			}
 			err := ValidateSkillFile(path)

@@ -10,7 +10,7 @@ import (
 // renaming it into place.
 func AtomicWriteFile(path string, data []byte, perm os.FileMode) error {
 	dir := filepath.Dir(path)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("create dir: %w", err)
 	}
 	f, err := os.CreateTemp(dir, ".tmp-*")

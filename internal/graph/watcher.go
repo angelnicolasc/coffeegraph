@@ -31,7 +31,7 @@ func WatchSkills(
 	}
 
 	skillsDir := filepath.Join(projectRoot, "skills")
-	_ = os.MkdirAll(skillsDir, 0755) // ensure it exists
+	_ = os.MkdirAll(skillsDir, 0o755) // ensure it exists
 	if err := addRecursive(watcher, skillsDir); err != nil {
 		_ = watcher.Close()
 		return nil, err

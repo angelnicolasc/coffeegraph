@@ -18,14 +18,14 @@ func TestWatchSkillsDebounce(t *testing.T) {
 
 	root := t.TempDir()
 	skillsDir := filepath.Join(root, "skills", "test-skill")
-	if err := os.MkdirAll(skillsDir, 0755); err != nil {
+	if err := os.MkdirAll(skillsDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(skillsDir, "SKILL.md"), []byte("# Skill: test\n"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(skillsDir, "SKILL.md"), []byte("# Skill: test\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// Write graph.json so Generate doesn't fail.
-	if err := os.WriteFile(filepath.Join(root, "graph.json"), []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "graph.json"), []byte("{}"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -50,7 +50,7 @@ func TestWatchSkillsDebounce(t *testing.T) {
 		_ = os.WriteFile(
 			filepath.Join(skillsDir, "SKILL.md"),
 			[]byte("# Skill: test\n## updated\n"),
-			0644,
+			0o644,
 		)
 		time.Sleep(30 * time.Millisecond)
 	}
@@ -73,7 +73,7 @@ func TestWatchSkillsCancel(t *testing.T) {
 	}
 
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, "skills"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, "skills"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 

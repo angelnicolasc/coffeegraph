@@ -15,7 +15,7 @@ func setupProject(t *testing.T, withAPIKey bool) (string, *config.Config) {
 	if err := os.MkdirAll(skillsDir, 0o755); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join(skillsDir, "SKILL.md"), []byte("# Skill: test\n"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(skillsDir, "SKILL.md"), []byte("# Skill: test\n"), 0o644); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 
@@ -71,7 +71,7 @@ func TestRunSkillMissingSKILLMD(t *testing.T) {
 	root, cfg := setupProject(t, true)
 	// Create a skill directory without SKILL.md.
 	badSkill := filepath.Join(root, "skills", "bad-skill")
-	if err := os.MkdirAll(badSkill, 0755); err != nil {
+	if err := os.MkdirAll(badSkill, 0o755); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}
 	checks, err := Run(root, cfg)

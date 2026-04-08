@@ -18,17 +18,17 @@ func setupProject(t *testing.T) (string, *config.Config) {
 		filepath.Join(root, ".coffee", "logs"),
 		filepath.Join(root, ".coffee", "snapshots"),
 	} {
-		if err := os.MkdirAll(d, 0755); err != nil {
+		if err := os.MkdirAll(d, 0o755); err != nil {
 			t.Fatalf("setup: %v", err)
 		}
 	}
 	// Write a valid SKILL.md.
 	skillMD := "# Skill: test-skill\n\n## Identity\nYou are a test agent.\n\n## Workflow\n1. Do stuff\n\n## Output Format\nPlain text\n"
-	if err := os.WriteFile(filepath.Join(root, "skills", "test-skill", "SKILL.md"), []byte(skillMD), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "skills", "test-skill", "SKILL.md"), []byte(skillMD), 0o644); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 	// Write index.md.
-	if err := os.WriteFile(filepath.Join(root, "index.md"), []byte("# Test Agency\n"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "index.md"), []byte("# Test Agency\n"), 0o644); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 	// Write config.
@@ -42,7 +42,7 @@ skills:
     enabled: true
 `
 	cfgPath := filepath.Join(root, "config.yaml")
-	if err := os.WriteFile(cfgPath, []byte(cfgYAML), 0644); err != nil {
+	if err := os.WriteFile(cfgPath, []byte(cfgYAML), 0o644); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 	cfg, err := config.Load(cfgPath)
@@ -54,7 +54,7 @@ skills:
 		t.Fatalf("setup queue: %v", err)
 	}
 	// Write graph.json placeholder.
-	if err := os.WriteFile(filepath.Join(root, "graph.json"), []byte(`{"generated_at":"2024-01-01T00:00:00Z","agency":"test","nodes":[{"id":"index","label":"Brain","type":"hub","status":"active"}],"edges":[]}`), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "graph.json"), []byte(`{"generated_at":"2024-01-01T00:00:00Z","agency":"test","nodes":[{"id":"index","label":"Brain","type":"hub","status":"active"}],"edges":[]}`), 0o644); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 	return root, cfg
@@ -110,7 +110,7 @@ func TestExecuteTaskSkillDisabled(t *testing.T) {
 func TestExecuteTaskInvalidSkillMD(t *testing.T) {
 	root, cfg := setupProject(t)
 	// Overwrite SKILL.md with invalid content.
-	if err := os.WriteFile(filepath.Join(root, "skills", "test-skill", "SKILL.md"), []byte("just random text"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(root, "skills", "test-skill", "SKILL.md"), []byte("just random text"), 0o644); err != nil {
 		t.Fatalf("write invalid skill: %v", err)
 	}
 	engine := &Engine{Root: root, Cfg: cfg}

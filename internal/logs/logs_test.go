@@ -34,7 +34,7 @@ func TestWriteAndRead(t *testing.T) {
 
 func TestReadFileFallbackPlainText(t *testing.T) {
 	p := filepath.Join(t.TempDir(), "plain.md")
-	if err := os.WriteFile(p, []byte("hello"), 0644); err != nil {
+	if err := os.WriteFile(p, []byte("hello"), 0o644); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 	got, err := ReadFile(p)

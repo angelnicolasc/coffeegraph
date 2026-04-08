@@ -74,7 +74,7 @@ func RunSuggest(vaultPath string, deep bool) error {
 			}
 		}
 		dst := filepath.Join(outDir, name)
-		if err := fsutil.AtomicWriteFile(dst, []byte(strings.TrimSpace(p)+"\n"), 0644); err != nil {
+		if err := fsutil.AtomicWriteFile(dst, []byte(strings.TrimSpace(p)+"\n"), 0o644); err != nil {
 			return err
 		}
 		fmt.Println("Wrote", dst)

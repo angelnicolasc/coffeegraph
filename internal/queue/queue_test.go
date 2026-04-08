@@ -9,7 +9,7 @@ import (
 func setupProject(t *testing.T) string {
 	t.Helper()
 	root := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(root, ".coffee"), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, ".coffee"), 0o755); err != nil {
 		t.Fatalf("setup: %v", err)
 	}
 	return root
