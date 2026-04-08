@@ -10,6 +10,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/coffeegraph/coffeegraph/internal/fsutil"
 )
 
 // Item is a single entry in .coffee/queue.json.
@@ -67,7 +69,7 @@ func Write(projectRoot string, items []Item) error {
 	if err != nil {
 		return fmt.Errorf("marshal queue: %w", err)
 	}
-	return os.WriteFile(p, append(b, '\n'), 0644)
+	return fsutil.AtomicWriteFile(p, append(b, '\n'), 0644)
 }
 
 // Add appends an item and returns the position (1-based) among items

@@ -14,7 +14,7 @@ import (
 )
 
 // RunQueueAdd adds a task to the queue (via flags or interactive prompts).
-func RunQueueAdd(skillFlag, taskFlag string, priorityFlag int) error {
+func RunQueueAdd(skillFlag, taskFlag string, priorityFlag int, urgent bool) error {
 	root, err := project.FindRoot("")
 	if err != nil {
 		return err
@@ -62,6 +62,12 @@ func RunQueueAdd(skillFlag, taskFlag string, priorityFlag int) error {
 	}
 
 	it := queue.Item{Skill: skill, Task: task, Priority: priority}
+	if urgent {
+		if it.Data != "" {
+			it.Data += "\n"
+		}
+		it.Data += "mode=urgent"
+	}
 	pos, total, err := queue.Add(root, it)
 	if err != nil {
 		return err

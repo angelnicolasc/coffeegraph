@@ -45,6 +45,12 @@ A folder of Markdown files and a single command is all you need.
 
 Each **skill** is a self-contained AI agent with its own identity, prompts, n8n integration, and output format. You compose them, queue tasks, and `coffee` mode executes everything autonomously while you're away.
 
+If something does not work, run this first:
+
+```bash
+coffeegraph doctor
+```
+
 ---
 
 ## Architecture
@@ -116,6 +122,18 @@ coffeegraph visualize             Open browser graph (WebSocket live)
 coffeegraph deploy openclaw       Export skills to OpenClaw (SOUL.md)
 coffeegraph deploy hermes         Export skills to Hermes Agent (AGENT.md)
 coffeegraph suggest               Ask the AI to suggest new skills for your business
+coffeegraph bot                   Run Telegram bot adapter (@skill task)
+coffeegraph share [job-id]        Share last or specific completed job
+coffeegraph log --pretty          Pretty terminal receipts for completed jobs
+coffeegraph doctor                Dependency and integration health checks
+coffeegraph evolve <skill>        Improve a skill from its latest execution log
+coffeegraph mcp                   Run as MCP server over stdio
+coffeegraph skill list            List community skills
+coffeegraph skill install <name>  Install community skill into current project
+coffeegraph skill publish         Open publish flow for community registry
+coffeegraph roast                 Roast your business context
+coffeegraph party                 Round-robin conversation between skills
+coffeegraph nap                   Pause with playful animation
 ```
 
 ### Queue a task
@@ -182,11 +200,22 @@ The only file you must edit to get started: `config.yaml` — add your Anthropic
 ```yaml
 agency_name: my-agency
 default_model: claude-sonnet-4-6
-anthropic_api_key: sk-ant-...   # or use env var
+backend: anthropic
+auto_evolve: false
+mcp: false
+
+api_keys:
+  anthropic: sk-ant-...         # or use env var
+  github: ghp_...               # optional (share via gist)
+  telegram_bot_token: 1234:abcd # optional (coffeegraph bot)
+
+bot:
+  allowed_chat_ids: [123456789] # required for bot
 
 skills:
   sales-closer:
     model: claude-opus-4-6       # per-skill model override
+    backend: anthropic            # or ollama
   content-engine:
     enabled: true
 ```
@@ -194,7 +223,10 @@ skills:
 **Environment variables** (override config.yaml)
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...
+export GITHUB_TOKEN=ghp_...
+export TELEGRAM_BOT_TOKEN=1234:abcd
 export COFFEEGRAPH_MODEL=claude-sonnet-4-6
+export COFFEEGRAPH_BACKEND=ollama
 export COFFEEGRAPH_N8N_WEBHOOK=https://your-n8n.app/webhook/coffeegraph
 ```
 

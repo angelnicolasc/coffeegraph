@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/coffeegraph/coffeegraph/internal/fsutil"
 	"gopkg.in/yaml.v3"
 )
 
@@ -15,15 +16,26 @@ import (
 type Config struct {
 	AgencyName   string                `yaml:"agency_name"`
 	DefaultModel string                `yaml:"default_model"`
+	Backend      string                `yaml:"backend"`
+	AutoEvolve   bool                  `yaml:"auto_evolve"`
+	MCP          bool                  `yaml:"mcp"`
 	APIKeys      APIKeysConfig         `yaml:"api_keys"`
 	Skills       map[string]SkillEntry `yaml:"skills"`
 	Coffee       CoffeeConfig          `yaml:"coffee_mode"`
+	Bot          BotConfig             `yaml:"bot"`
 }
 
 // APIKeysConfig holds sensitive credentials.
 type APIKeysConfig struct {
 	Anthropic  string `yaml:"anthropic"`
+	GitHub     string `yaml:"github"`
+	Telegram   string `yaml:"telegram_bot_token"`
 	N8nWebhook string `yaml:"n8n_webhook"`
+}
+
+// BotConfig controls chat adapters.
+type BotConfig struct {
+	AllowedChatIDs []int64 `yaml:"allowed_chat_ids"`
 }
 
 // CoffeeConfig controls coffee mode behaviour.
@@ -37,6 +49,7 @@ type CoffeeConfig struct {
 type SkillEntry struct {
 	Enabled    bool   `yaml:"enabled"`
 	Model      string `yaml:"model"`
+	Backend    string `yaml:"backend"`
 	N8nWebhook string `yaml:"n8n_webhook"`
 }
 
@@ -56,7 +69,7 @@ func Write(path string, c *Config) error {
 	if err != nil {
 		return fmt.Errorf("marshal config: %w", err)
 	}
-	return os.WriteFile(path, b, 0644)
+	return fsutil.AtomicWriteFile(path, b, 0644)
 }
 
 // LoadRaw reads config.yaml without applying environment variable
@@ -85,6 +98,15 @@ func Load(path string) (*Config, error) {
 	if w := os.Getenv("COFFEEGRAPH_N8N_WEBHOOK"); w != "" {
 		c.APIKeys.N8nWebhook = w
 	}
+	if gh := os.Getenv("GITHUB_TOKEN"); gh != "" {
+		c.APIKeys.GitHub = gh
+	}
+	if bt := os.Getenv("TELEGRAM_BOT_TOKEN"); bt != "" {
+		c.APIKeys.Telegram = bt
+	}
+	if b := os.Getenv("COFFEEGRAPH_BACKEND"); b != "" {
+		c.Backend = b
+	}
 	if m := os.Getenv("COFFEEGRAPH_MODEL"); m != "" {
 		c.DefaultModel = m
 	}
@@ -95,6 +117,9 @@ func Load(path string) (*Config, error) {
 func (c *Config) applyDefaults() {
 	if c.DefaultModel == "" {
 		c.DefaultModel = "claude-sonnet-4-6"
+	}
+	if strings.TrimSpace(c.Backend) == "" {
+		c.Backend = "anthropic"
 	}
 	if c.Coffee.MaxTasksPerRun <= 0 {
 		c.Coffee.MaxTasksPerRun = 3
@@ -108,6 +133,14 @@ func (c *Config) ModelForSkill(skillName string) string {
 		return s.Model
 	}
 	return c.DefaultModel
+}
+
+// BackendForSkill returns the configured backend for a skill.
+func (c *Config) BackendForSkill(skillName string) string {
+	if s, ok := c.Skills[skillName]; ok && strings.TrimSpace(s.Backend) != "" {
+		return s.Backend
+	}
+	return c.Backend
 }
 
 // SkillEnabled reports whether the named skill is enabled. Skills not
@@ -128,6 +161,22 @@ func (c *Config) AnthropicKey() string {
 	return c.APIKeys.Anthropic
 }
 
+// GitHubToken returns the GitHub token.
+func (c *Config) GitHubToken() string {
+	if k := os.Getenv("GITHUB_TOKEN"); k != "" {
+		return k
+	}
+	return c.APIKeys.GitHub
+}
+
+// TelegramToken returns the Telegram bot token.
+func (c *Config) TelegramToken() string {
+	if k := os.Getenv("TELEGRAM_BOT_TOKEN"); k != "" {
+		return k
+	}
+	return c.APIKeys.Telegram
+}
+
 // Validate performs structural checks on the config.
 func (c *Config) Validate() error {
 	if strings.TrimSpace(c.AgencyName) == "" {
@@ -145,15 +194,26 @@ default_model: "claude-sonnet-4-6"
 
 api_keys:
   anthropic: ""                           # or set ANTHROPIC_API_KEY env var
+  github: ""                              # or set GITHUB_TOKEN env var
+  telegram_bot_token: ""                  # or set TELEGRAM_BOT_TOKEN env var
   n8n_webhook: ""                         # base URL of your n8n instance
+
+backend: "anthropic"                      # anthropic | ollama
+auto_evolve: false
+mcp: false
+
+bot:
+  allowed_chat_ids: []                    # required for coffeegraph bot
 
 skills:
   sales-closer:
     enabled: true
+    backend: "anthropic"
     model: "claude-sonnet-4-6"
     n8n_webhook: ""                       # per-skill override
   content-engine:
     enabled: true
+    backend: "anthropic"
     model: "claude-sonnet-4-6"
   lead-nurture:
     enabled: false

@@ -66,12 +66,12 @@ func RunInit(name string) error {
 	// Write config.yaml.
 	agency := strings.ReplaceAll(name, "-", " ")
 	cfgPath := filepath.Join(name, "config.yaml")
-	if err := os.WriteFile(cfgPath, []byte(config.DefaultConfigYAML(agency)), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(cfgPath, []byte(config.DefaultConfigYAML(agency)), 0644); err != nil {
 		return fmt.Errorf("write config: %w", err)
 	}
 
 	// Write index.md.
-	if err := os.WriteFile(filepath.Join(name, "index.md"), []byte(indexTemplate), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(filepath.Join(name, "index.md"), []byte(indexTemplate), 0644); err != nil {
 		return fmt.Errorf("write index.md: %w", err)
 	}
 
