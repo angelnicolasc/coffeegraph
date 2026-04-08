@@ -1,16 +1,27 @@
-# ☕ CoffeeGraph
+<h1 align="center">☕ CoffeeGraph ☕</h1>
+
+<h2 align="center">
+  One folder. One command. Your complete AI agency running on autopilot.
+</h2>
 
 <p align="center">
-  <strong>One folder. One command. Your complete AI agency running on autopilot.</strong><br/>
-  Sales · Content · Leads · Personal OS — modular skills, live graph, zero setup.
+  Sales · Content · Leads · Personal OS · Modular skills · Live graph · Zero setup
 </p>
-
 <p align="center">
-  <a href="https://github.com/angelnicolasc/coffeegraph/releases"><img src="https://img.shields.io/github/v/release/angelnicolasc/coffeegraph?style=flat-square&color=6f42c1" alt="Latest Release"/></a>
-  <a href="https://github.com/angelnicolasc/coffeegraph/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License"/></a>
-  <a href="https://goreportcard.com/report/github.com/angelnicolasc/coffeegraph"><img src="https://goreportcard.com/badge/github.com/angelnicolasc/coffeegraph?style=flat-square" alt="Go Report"/></a>
-  <img src="https://img.shields.io/badge/go-1.22+-00ADD8?style=flat-square&logo=go" alt="Go version"/>
-  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=flat-square" alt="Platform"/>
+  <a href="https://github.com/angelnicolasc/coffeegraph/actions">
+    <img src="https://img.shields.io/github/actions/workflow/status/angelnicolasc/coffeegraph/ci.yml?branch=main&style=for-the-badge" alt="CI status">
+  </a>
+  <a href="https://github.com/angelnicolasc/coffeegraph/releases">
+    <img src="https://img.shields.io/github/v/release/angelnicolasc/coffeegraph?include_prereleases&style=for-the-badge" alt="Latest Release">
+  </a>
+  <a href="https://github.com/angelnicolasc/coffeegraph/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge" alt="License">
+  </a>
+  <a href="https://goreportcard.com/report/github.com/angelnicolasc/coffeegraph">
+    <img src="https://img.shields.io/badge/Go%20Report-A%2B-brightgreen?style=for-the-badge&logo=go" alt="Go Report">
+  </a>
+  <img src="https://img.shields.io/badge/Go-1.22+-00ADD8?style=for-the-badge&logo=go&logoColor=white" alt="Go version">
+  <img src="https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-00ADD8?style=for-the-badge" alt="Platform">
 </p>
 
 ```bash
