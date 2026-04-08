@@ -1,0 +1,47 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/coffeegraph
+dist/
+
+# Build output
+/bin/
+
+# Go workspace
+go.work
+go.work.sum
+
+# Test cache
+*.test
+*.out
+coverage.html
+coverage.txt
+
+# Environment / secrets
+.env
+.env.*
+config.yaml
+*.key
+*.pem
+*.p12
+*.pfx
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
+
+# Internal playbook (not for public consumption)
+COFFEEGRAPH_PLAYBOOK.md

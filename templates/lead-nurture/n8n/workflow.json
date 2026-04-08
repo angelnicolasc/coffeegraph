@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "instanceId": "coffeegraph",
+    "templateCredsSetupCompleted": false
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-nurture",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json;\nconst leads = body.leads || [];\nreturn [{\n  json: {\n    skill: 'lead-nurture',\n    leads: leads,\n    task: body.task || 'Generate outreach sequence',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Lead Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.INSTANTLY_API_URL || 'https://api.instantly.ai/api/v1/lead/add' }}",
+        "method": "POST",
+        "headers": {
+          "Authorization": "Bearer {{ $env.INSTANTLY_API_KEY }}"
+        },
+        "body": "={{ JSON.stringify($json.leads) }}"
+      },
+      "id": "instantly-import",
+      "name": "Import to Instantly",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 200],
+      "notes": "Import leads + sequences to Instantly or Lemlist"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": "={{ $env.GSHEETS_LEADS_DOC_ID }}",
+        "sheetName": "Outreach",
+        "options": {}
+      },
+      "id": "gsheets-backup",
+      "name": "Backup to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [650, 400],
+      "notes": "Optional: backup lead sequences as CSV rows to Google Sheets"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Prepare Lead Data", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Lead Data": {
+      "main": [
+        [
+          { "node": "Import to Instantly", "type": "main", "index": 0 },
+          { "node": "Backup to Google Sheets", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  }
+}

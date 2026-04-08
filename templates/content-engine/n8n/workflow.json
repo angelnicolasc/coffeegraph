@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "instanceId": "coffeegraph",
+    "templateCredsSetupCompleted": false
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-engine",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json;\nreturn [{\n  json: {\n    skill: 'content-engine',\n    task: body.task || '',\n    content_type: body.content_type || 'thread',\n    data: body.data || '',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "create",
+        "databaseId": "={{ $env.NOTION_CONTENT_DATABASE_ID }}",
+        "properties": {
+          "Title": "={{ $json.task }}",
+          "Type": "={{ $json.content_type }}",
+          "Status": "Draft",
+          "Created": "={{ $json.timestamp }}"
+        }
+      },
+      "id": "notion-archive",
+      "name": "Archive to Notion",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [650, 200],
+      "notes": "Archives content output to Notion content database"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BUFFER_API_URL || 'https://api.bufferapp.com/1/updates/create.json' }}",
+        "method": "POST",
+        "body": {
+          "text": "={{ $json.task }}",
+          "profile_ids": "={{ $env.BUFFER_PROFILE_IDS }}"
+        }
+      },
+      "id": "buffer-schedule",
+      "name": "Schedule via Buffer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 400],
+      "notes": "Optional: schedule content via Buffer or Hypefury API"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Prepare Data", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          { "node": "Archive to Notion", "type": "main", "index": 0 },
+          { "node": "Schedule via Buffer", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  }
+}

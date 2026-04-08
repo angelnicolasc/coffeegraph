@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "instanceId": "coffeegraph",
+    "templateCredsSetupCompleted": false
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "sales-closer",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json;\nconst task = body.task || '';\nconst leadData = body.lead_data || body.data || '';\nconst context = body.context || '';\n\nreturn [{\n  json: {\n    skill: 'sales-closer',\n    task: task,\n    lead_data: leadData,\n    context: context,\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "create",
+        "databaseId": "={{ $env.NOTION_CRM_DATABASE_ID }}",
+        "properties": {
+          "Name": "={{ $json.task }}",
+          "Status": "Pending",
+          "Skill": "sales-closer",
+          "Created": "={{ $json.timestamp }}"
+        }
+      },
+      "id": "notion-crm",
+      "name": "Save to Notion CRM",
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2,
+      "position": [650, 200],
+      "notes": "Configure your Notion CRM database ID in env vars"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $env.GMAIL_DRAFTS_TO }}",
+        "subject": "CoffeeGraph — Sales Closer Output",
+        "message": "={{ $json.task }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "id": "gmail-draft",
+      "name": "Create Gmail Draft",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2,
+      "position": [650, 400],
+      "notes": "Optional: creates a draft in Gmail with the output"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Prepare Data", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Data": {
+      "main": [
+        [
+          { "node": "Save to Notion CRM", "type": "main", "index": 0 },
+          { "node": "Create Gmail Draft", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  }
+}

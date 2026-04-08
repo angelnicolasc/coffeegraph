@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "instanceId": "coffeegraph",
+    "templateCredsSetupCompleted": false
+  },
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "creator-stack",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json;\nreturn [{\n  json: {\n    skill: 'creator-stack',\n    topic: body.topic || body.task || '',\n    url: body.url || '',\n    data: body.data || '',\n    timestamp: new Date().toISOString()\n  }\n}];"
+      },
+      "id": "prepare-data",
+      "name": "Prepare Topic Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "documentId": "={{ $env.GDOCS_SCRIPTS_FOLDER_ID }}",
+        "title": "Script — {{ $json.topic }}",
+        "content": "={{ $json.script_output || '' }}"
+      },
+      "id": "gdocs-script",
+      "name": "Save Script to Google Docs",
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 1,
+      "position": [650, 200],
+      "notes": "Creates a new Google Doc with the YouTube script"
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.BUFFER_API_URL || 'https://api.bufferapp.com/1/updates/create.json' }}",
+        "method": "POST",
+        "body": {
+          "text": "={{ $json.thread_output || '' }}",
+          "profile_ids": "={{ $env.BUFFER_PROFILE_IDS }}"
+        }
+      },
+      "id": "buffer-schedule",
+      "name": "Schedule X + IG via Buffer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [650, 400],
+      "notes": "Schedules the X thread and IG caption via Buffer"
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [{ "node": "Prepare Topic Data", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prepare Topic Data": {
+      "main": [
+        [
+          { "node": "Save Script to Google Docs", "type": "main", "index": 0 },
+          { "node": "Schedule X + IG via Buffer", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  }
+}

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>CoffeeGraph</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+  <style>
+    body { margin: 0; background: #0f0f0f; color: #e0e0e0; font-family: system-ui, sans-serif; }
+    #cy { width: 100vw; height: 100vh; }
+    #panel {
+      position: fixed; top: 16px; left: 16px;
+      background: rgba(20,20,20,0.92); border: 1px solid #333;
+      border-radius: 10px; padding: 14px 18px; font-size: 13px;
+      min-width: 200px; backdrop-filter: blur(8px);
+    }
+    #panel h3 { margin: 0 0 10px; font-size: 15px; font-weight: 500; }
+    .stat { display: flex; justify-content: space-between; margin: 4px 0; color: #888; }
+    .stat span:last-child { color: #e0e0e0; font-weight: 500; }
+    #tooltip {
+      position: fixed; display: none;
+      background: rgba(20,20,20,0.96); border: 1px solid #444;
+      border-radius: 8px; padding: 12px 16px; font-size: 12px;
+      max-width: 280px; pointer-events: none; z-index: 100;
+    }
+    #tooltip h4 { margin: 0 0 6px; font-size: 14px; }
+    #tooltip p { margin: 4px 0; color: #888; }
+    #tooltip .status-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 4px;
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+    }
+    #coffee-indicator {
+      position: fixed; bottom: 16px; right: 16px;
+      background: rgba(20,20,20,0.92); border: 1px solid #c17f24;
+      border-radius: 10px; padding: 10px 16px; font-size: 13px;
+      display: none;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  </style>
+</head>
+<body>
+  <div id="panel">
+    <h3>☕ CoffeeGraph</h3>
+    <div class="stat"><span>Agencia</span><span id="agency-name">—</span></div>
+    <div class="stat"><span>Skills activos</span><span id="active-count">—</span></div>
+    <div class="stat"><span>Tasks pendientes</span><span id="pending-count">—</span></div>
+    <div class="stat"><span>Última actualización</span><span id="last-update">—</span></div>
+  </div>
+  <div id="tooltip">
+    <h4 id="tip-name"></h4>
+    <p><span class="status-badge" id="tip-status"></span></p>
+    <p id="tip-preview"></p>
+    <p id="tip-tasks"></p>
+  </div>
+  <div id="coffee-indicator">☕ Coffee Mode activo — tu equipo está trabajando</div>
+  <div id="cy"></div>
+  <script>
+  const CATEGORY_COLORS = {
+    hub:      { bg: '#3d2e7a', border: '#7c5cbf' },
+    sales:    { bg: '#7a4a0a', border: '#d4831a' },
+    content:  { bg: '#0a4a3a', border: '#1a9a7a' },
+    leads:    { bg: '#0a2a5a', border: '#1a5abf' },
+    personal: { bg: '#5a1a2a', border: '#bf3a5a' },
+    creator:  { bg: '#1a3a0a', border: '#3a8a1a' },
+    default:  { bg: '#2a2a2a', border: '#555' }
+  };
+  const STATUS_COLORS = {
+    idle:    '#555',
+    running: '#d4831a',
+    done:    '#3a8a1a',
+    error:   '#8a1a1a',
+    active:  '#7c5cbf'
+  };
+  let cy;
+  function initGraph(data) {
+    const elements = [];
+    data.nodes.forEach(n => {
+      const cat = n.category || n.type;
+      const colors = CATEGORY_COLORS[cat] || CATEGORY_COLORS.default;
+      const border = STATUS_COLORS[n.status] || colors.border;
+      elements.push({
+        data: {
+          id: n.id,
+          label: n.label,
+          status: n.status,
+          graphType: n.type || 'skill',
+          preview: n.last_output_preview || '',
+          tasks: n.tasks_pending || 0,
+          bgColor: colors.bg,
+          borderColor: border,
+          nodeData: n
+        }
+      });
+    });
+    data.edges.forEach(e => {
+      elements.push({
+        data: { source: e.from, target: e.to, label: e.label || '' }
+      });
+    });
+    cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements,
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'background-color': 'data(bgColor)',
+            'border-color': 'data(borderColor)',
+            'border-width': 2,
+            'label': 'data(label)',
+            'color': '#e0e0e0',
+            'font-size': '13px',
+            'font-family': 'system-ui, sans-serif',
+            'text-valign': 'center',
+            'text-halign': 'center',
+            'width': 90,
+            'height': 90,
+            'shape': 'roundrectangle'
+          }
+        },
+        {
+          selector: 'node[graphType = "hub"]',
+          style: { 'width': 110, 'height': 110, 'font-size': '14px', 'font-weight': 'bold' }
+        },
+        {
+          selector: 'node[status = "running"]',
+          style: { 'border-width': 3, 'border-color': '#d4831a' }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'line-color': '#333',
+            'target-arrow-color': '#444',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier',
+            'width': 1.5,
+            'label': 'data(label)',
+            'font-size': '10px',
+            'color': '#555',
+            'text-background-opacity': 1,
+            'text-background-color': '#0f0f0f',
+            'text-background-padding': '2px'
+          }
+        }
+      ],
+      layout: {
+        name: 'cose',
+        animate: true,
+        animationDuration: 800,
+        nodeDimensionsIncludeLabels: true,
+        randomize: false,
+        idealEdgeLength: 150,
+        nodeRepulsion: 8000
+      }
+    });
+    document.getElementById('agency-name').textContent = data.agency || '—';
+    document.getElementById('active-count').textContent =
+      data.nodes.filter(n => n.enabled !== false && n.type === 'skill').length;
+    document.getElementById('pending-count').textContent =
+      data.nodes.reduce((acc, n) => acc + (n.tasks_pending || 0), 0);
+    document.getElementById('last-update').textContent =
+      data.generated_at ? new Date(data.generated_at).toLocaleTimeString() : '—';
+    cy.on('mouseover', 'node', function(evt) {
+      const n = evt.target.data('nodeData');
+      const tip = document.getElementById('tooltip');
+      document.getElementById('tip-name').textContent = n.label;
+      const badge = document.getElementById('tip-status');
+      badge.textContent = n.status;
+      badge.style.background = STATUS_COLORS[n.status] || '#333';
+      document.getElementById('tip-preview').textContent = n.last_output_preview || 'Sin actividad reciente';
+      document.getElementById('tip-tasks').textContent =
+        n.tasks_pending ? `${n.tasks_pending} task(s) pendiente(s)` : '';
+      tip.style.display = 'block';
+    });
+    cy.on('mouseout', 'node', () => {
+      document.getElementById('tooltip').style.display = 'none';
+    });
+    cy.on('mousemove', (evt) => {
+      const tip = document.getElementById('tooltip');
+      if (tip.style.display === 'block') {
+        tip.style.left = (evt.originalEvent.clientX + 16) + 'px';
+        tip.style.top = (evt.originalEvent.clientY - 20) + 'px';
+      }
+    });
+  }
+  function connectWS() {
+    const loc = window.location;
+    const wsUrl = (loc.protocol === 'https:' ? 'wss://' : 'ws://') + loc.host + '/ws';
+    const ws = new WebSocket(wsUrl);
+    ws.onmessage = (evt) => {
+      const data = JSON.parse(evt.data);
+      if (cy) {
+        data.nodes.forEach(n => {
+          const node = cy.getElementById(n.id);
+          if (node.length) {
+            const colors = CATEGORY_COLORS[n.category || n.type] || CATEGORY_COLORS.default;
+            node.data('status', n.status);
+            node.data('borderColor', STATUS_COLORS[n.status] || colors.border);
+            node.data('nodeData', n);
+          }
+        });
+        document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        document.getElementById('pending-count').textContent =
+          data.nodes.reduce((acc, n) => acc + (n.tasks_pending || 0), 0);
+      }
+    };
+    ws.onclose = () => setTimeout(connectWS, 3000);
+  }
+  fetch('/graph.json')
+    .then(r => r.json())
+    .then(data => { initGraph(data); connectWS(); })
+    .catch(() => {
+      initGraph({
+        agency: 'demo-agency',
+        nodes: [
+          {id:'index', label:'Cerebro', type:'hub', status:'active'},
+          {id:'sales-closer', label:'Sales Closer', type:'skill', category:'sales', status:'idle', tasks_pending:2, enabled:true},
+          {id:'content-engine', label:'Content Engine', type:'skill', category:'content', status:'running', tasks_pending:0, enabled:true},
+          {id:'life-os', label:'Life OS', type:'skill', category:'personal', status:'idle', tasks_pending:1, enabled:true}
+        ],
+        edges: [
+          {from:'index', to:'sales-closer'},
+          {from:'index', to:'content-engine'},
+          {from:'index', to:'life-os'}
+        ]
+      });
+    });
+  </script>
+</body>
+</html>
