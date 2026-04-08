@@ -1,12 +1,18 @@
-<h1 align="center">☕ CoffeeGraph ☕</h1>
+<div align="center">
+  <img width="1500" height="276" alt="coffeegraph-banner" src=".github/assets/coffeegraph-banner1.jpg" />
+</div>
 
-<h2 align="center">
-  One folder. One command. Your complete AI agency running on autopilot.
-</h2>
+<h1 align="center">☕ CoffeeGraph ☕  </h1>
 
-<p align="center">
+<div align="center">
+  <strong>One folder. One command. Your complete AI agency running on autopilot.</strong>
+  <br />
   Sales · Content · Leads · Personal OS · Modular skills · Live graph · Zero setup
-</p>
+  <br /><br />
+  Free, offline, no account required.
+</div>
+
+<br />
 <p align="center">
   <a href="https://github.com/angelnicolasc/coffeegraph/actions">
     <img src="https://img.shields.io/github/actions/workflow/status/angelnicolasc/coffeegraph/ci.yml?branch=main&style=for-the-badge" alt="CI status">
