@@ -87,7 +87,7 @@ func Generate(projectRoot string, cfg *config.Config, tasksPending map[string]in
 			// For custom skills: convert kebab-case to Title Case.
 			parts := strings.Split(name, "-")
 			for i, p := range parts {
-				if len(p) > 0 {
+				if p != "" {
 					parts[i] = strings.ToUpper(p[:1]) + p[1:]
 				}
 			}

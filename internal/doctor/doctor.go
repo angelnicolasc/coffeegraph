@@ -58,7 +58,7 @@ func Run(root string, cfg *config.Config) ([]CheckResult, error) {
 	return out, nil
 }
 
-func ping(url string) (bool, string) {
+func ping(url string) (ok bool, detail string) {
 	c := http.Client{Timeout: 3 * time.Second}
 	resp, err := c.Get(url)
 	if err != nil {

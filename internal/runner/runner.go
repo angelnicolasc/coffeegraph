@@ -51,7 +51,7 @@ type TaskResult struct {
 }
 
 // ExecutePending runs up to max tasks from queue.
-func (e *Engine) ExecutePending(ctx context.Context, max int, mode Mode) (ExecSummary, error) {
+func (e *Engine) ExecutePending(ctx context.Context, limit int, mode Mode) (ExecSummary, error) {
 	items, err := queue.Read(e.Root)
 	if err != nil {
 		return ExecSummary{}, err
@@ -59,11 +59,11 @@ func (e *Engine) ExecutePending(ctx context.Context, max int, mode Mode) (ExecSu
 	if len(items) == 0 {
 		return ExecSummary{}, nil
 	}
-	if max <= 0 || max > len(items) {
-		max = len(items)
+	if limit <= 0 || limit > len(items) {
+		limit = len(items)
 	}
 	var out ExecSummary
-	for i := 0; i < max; i++ {
+	for i := 0; i < limit; i++ {
 		if err := ctx.Err(); err != nil {
 			out.Errors = append(out.Errors, err.Error())
 			break

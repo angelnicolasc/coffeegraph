@@ -16,7 +16,7 @@ import (
 )
 
 // Suggest generates an updated SKILL.md proposal for a given skill.
-func Suggest(ctx context.Context, root string, cfg *config.Config, skill string) (string, string, error) {
+func Suggest(ctx context.Context, root string, cfg *config.Config, skill string) (outPath, proposed string, err error) {
 	entry, err := latestBySkill(root, skill)
 	if err != nil {
 		return "", "", err
@@ -63,14 +63,14 @@ func latestBySkill(root, skill string) (*logs.Entry, error) {
 }
 
 // Apply writes a proposed SKILL.md update and appends changelog marker.
-func Apply(path string, content string) error {
+func Apply(path, content string) error {
 	if strings.TrimSpace(content) == "" {
 		return fmt.Errorf("empty evolved content")
 	}
 	if !strings.Contains(content, "## Changelog") {
 		content += "\n\n## Changelog\n- Updated by coffeegraph evolve.\n"
 	}
-	return fsutil.AtomicWriteFile(path, []byte(content+"\n"), 0644)
+	return fsutil.AtomicWriteFile(path, []byte(content+"\n"), 0o644)
 }
 
 // DetectRoot resolves project root for evolve commands.

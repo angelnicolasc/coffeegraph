@@ -29,7 +29,7 @@ func RunEvolve(skill string, auto bool) error {
 		return err
 	}
 	tmp := filepath.Join(root, ".coffee", "tmp-evolve.md")
-	if err := fsutil.AtomicWriteFile(tmp, []byte(proposed), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(tmp, []byte(proposed), 0o644); err != nil {
 		return err
 	}
 	defer os.Remove(tmp)

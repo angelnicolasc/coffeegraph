@@ -44,10 +44,10 @@ func (h *GraphHandler) serveGraphJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	b, err := os.ReadFile(h.graphPath)
 	if err != nil {
-		w.Write([]byte(`{"agency":"—","nodes":[],"edges":[]}`))
+		_, _ = w.Write([]byte(`{"agency":"—","nodes":[],"edges":[]}`))
 		return
 	}
-	w.Write(b)
+	_, _ = w.Write(b)
 }
 
 // handleWS upgrades an HTTP connection to WebSocket and keeps it alive

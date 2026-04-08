@@ -25,7 +25,7 @@ func TestServeGraphJSONOK(t *testing.T) {
 	mux := http.NewServeMux()
 	h.Register(mux)
 
-	req := httptest.NewRequest(http.MethodGet, "/graph.json", nil)
+	req := httptest.NewRequest(http.MethodGet, "/graph.json", http.NoBody)
 	w := httptest.NewRecorder()
 	mux.ServeHTTP(w, req)
 
@@ -51,7 +51,7 @@ func TestServeGraphJSONMissingFile(t *testing.T) {
 	mux := http.NewServeMux()
 	h.Register(mux)
 
-	req := httptest.NewRequest(http.MethodGet, "/graph.json", nil)
+	req := httptest.NewRequest(http.MethodGet, "/graph.json", http.NoBody)
 	w := httptest.NewRecorder()
 	mux.ServeHTTP(w, req)
 
@@ -71,7 +71,7 @@ func TestNoCacheHeader(t *testing.T) {
 	mux := http.NewServeMux()
 	h.Register(mux)
 
-	req := httptest.NewRequest(http.MethodGet, "/graph.json", nil)
+	req := httptest.NewRequest(http.MethodGet, "/graph.json", http.NoBody)
 	w := httptest.NewRecorder()
 	mux.ServeHTTP(w, req)
 

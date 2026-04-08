@@ -55,7 +55,7 @@ func RunAdd(skillName string) error {
 	if err != nil {
 		return err
 	}
-	if err := os.MkdirAll(dst, 0755); err != nil {
+	if err := os.MkdirAll(dst, 0o755); err != nil {
 		return err
 	}
 	if err := fsutil.CopyFSToDir(sub, ".", dst); err != nil {

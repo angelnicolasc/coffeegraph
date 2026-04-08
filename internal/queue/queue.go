@@ -62,19 +62,19 @@ func Write(projectRoot string, items []Item) error {
 		items = []Item{}
 	}
 	p := Path(projectRoot)
-	if err := os.MkdirAll(filepath.Dir(p), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(p), 0o755); err != nil {
 		return fmt.Errorf("create queue dir: %w", err)
 	}
 	b, err := json.MarshalIndent(items, "", "  ")
 	if err != nil {
 		return fmt.Errorf("marshal queue: %w", err)
 	}
-	return fsutil.AtomicWriteFile(p, append(b, '\n'), 0644)
+	return fsutil.AtomicWriteFile(p, append(b, '\n'), 0o644)
 }
 
 // Add appends an item and returns the position (1-based) among items
 // for the same skill, and the total queue size.
-func Add(projectRoot string, it Item) (position int, total int, err error) {
+func Add(projectRoot string, it Item) (position, total int, err error) {
 	if it.ID == "" {
 		it.ID = strconv.FormatInt(time.Now().UnixNano(), 36)
 	}
@@ -99,7 +99,7 @@ func Add(projectRoot string, it Item) (position int, total int, err error) {
 }
 
 // Remove deletes the item with the given ID from the queue.
-func Remove(projectRoot string, id string) error {
+func Remove(projectRoot, id string) error {
 	items, err := Read(projectRoot)
 	if err != nil {
 		return err

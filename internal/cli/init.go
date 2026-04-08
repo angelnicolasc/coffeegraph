@@ -58,7 +58,7 @@ func RunInit(name string) error {
 		filepath.Join(name, ".coffee", "snapshots"),
 	}
 	for _, d := range dirs {
-		if err := os.MkdirAll(d, 0755); err != nil {
+		if err := os.MkdirAll(d, 0o755); err != nil {
 			return fmt.Errorf("create %s: %w", d, err)
 		}
 	}
@@ -66,18 +66,18 @@ func RunInit(name string) error {
 	// Write config.yaml.
 	agency := strings.ReplaceAll(name, "-", " ")
 	cfgPath := filepath.Join(name, "config.yaml")
-	if err := fsutil.AtomicWriteFile(cfgPath, []byte(config.DefaultConfigYAML(agency)), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(cfgPath, []byte(config.DefaultConfigYAML(agency)), 0o644); err != nil {
 		return fmt.Errorf("write config: %w", err)
 	}
 
 	// Write index.md.
-	if err := fsutil.AtomicWriteFile(filepath.Join(name, "index.md"), []byte(indexTemplate), 0644); err != nil {
+	if err := fsutil.AtomicWriteFile(filepath.Join(name, "index.md"), []byte(indexTemplate), 0o644); err != nil {
 		return fmt.Errorf("write index.md: %w", err)
 	}
 
 	// Copy templates for reference.
 	templatesDst := filepath.Join(name, "templates")
-	if err := os.MkdirAll(templatesDst, 0755); err != nil {
+	if err := os.MkdirAll(templatesDst, 0o755); err != nil {
 		return err
 	}
 	if err := fsutil.CopyFSToDir(templates.FS, ".", templatesDst); err != nil {

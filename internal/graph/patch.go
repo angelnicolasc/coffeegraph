@@ -9,7 +9,7 @@ import (
 // UpdateSkill atomically loads graph.json, applies fn to the named skill
 // node, updates generated_at, and writes back. Returns an error if the
 // graph cannot be loaded or the skill node is not found.
-func UpdateSkill(projectRoot string, skillID string, fn func(*Node)) error {
+func UpdateSkill(projectRoot, skillID string, fn func(*Node)) error {
 	p := filepath.Join(projectRoot, "graph.json")
 	g, err := LoadFile(p)
 	if err != nil {

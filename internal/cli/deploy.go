@@ -31,7 +31,7 @@ func runDeploy(kind string) error {
 	}
 
 	outDir := filepath.Join(root, ".coffee", "deploy", kind)
-	_ = os.MkdirAll(outDir, 0755)
+	_ = os.MkdirAll(outDir, 0o755)
 
 	n := 0
 	for name, ent := range cfg.Skills {
@@ -55,7 +55,7 @@ func runDeploy(kind string) error {
 			out = convertToHermes(name, string(body), cfg)
 			filename = name + "-AGENT.md"
 		}
-		if err := os.WriteFile(filepath.Join(outDir, filename), []byte(out), 0644); err != nil {
+		if err := os.WriteFile(filepath.Join(outDir, filename), []byte(out), 0o644); err != nil {
 			return fmt.Errorf("write %s: %w", filename, err)
 		}
 		n++

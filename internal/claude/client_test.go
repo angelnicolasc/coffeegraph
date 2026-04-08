@@ -24,7 +24,7 @@ func TestCompleteMissingAPIKey(t *testing.T) {
 func TestCompleteSuccess(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
-		w.Write([]byte(`{"content":[{"type":"text","text":"hello world"}],"usage":{"input_tokens":10,"output_tokens":5}}`))
+		_, _ = w.Write([]byte(`{"content":[{"type":"text","text":"hello world"}],"usage":{"input_tokens":10,"output_tokens":5}}`))
 	}))
 	defer srv.Close()
 
@@ -54,7 +54,7 @@ func TestCompleteNonRetryableError(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		atomic.AddInt32(&calls, 1)
 		w.WriteHeader(401)
-		w.Write([]byte(`{"error":"unauthorized"}`))
+		_, _ = w.Write([]byte(`{"error":"unauthorized"}`))
 	}))
 	defer srv.Close()
 
@@ -81,10 +81,10 @@ func TestCompleteRetriesOnServerError(t *testing.T) {
 		n := atomic.AddInt32(&calls, 1)
 		if n < 3 {
 			w.WriteHeader(500)
-			w.Write([]byte(`{"error":"server error"}`))
+			_, _ = w.Write([]byte(`{"error":"server error"}`))
 			return
 		}
-		w.Write([]byte(`{"content":[{"type":"text","text":"recovered"}],"usage":{"input_tokens":1,"output_tokens":1}}`))
+		_, _ = w.Write([]byte(`{"content":[{"type":"text","text":"recovered"}],"usage":{"input_tokens":1,"output_tokens":1}}`))
 	}))
 	defer srv.Close()
 
